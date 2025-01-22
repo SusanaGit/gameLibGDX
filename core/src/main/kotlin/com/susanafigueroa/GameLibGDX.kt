@@ -8,7 +8,7 @@ class GameLibGDX : Game() {
 
     override fun create() {
 
-        setScreen(StartScreen())
+        setScreen(StartScreen(this))
 
     }
 
