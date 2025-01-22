@@ -1,6 +1,16 @@
 package com.susanafigueroa
 
-import com.badlogic.gdx.ApplicationAdapter
+import com.badlogic.gdx.Game
 
 /** [com.badlogic.gdx.ApplicationListener] implementation shared by all platforms. */
-class GameLibGDX : ApplicationAdapter()
+class GameLibGDX : Game() {
+
+    override fun create() {
+
+    }
+
+    override fun dispose() {
+
+    }
+
+}
