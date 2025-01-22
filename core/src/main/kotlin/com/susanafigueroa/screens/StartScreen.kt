@@ -3,6 +3,7 @@ package com.susanafigueroa.screens
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -10,19 +11,29 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import com.badlogic.gdx.utils.viewport.ScreenViewport
+import com.badlogic.gdx.utils.viewport.FitViewport
 import com.susanafigueroa.GameLibGDX
+import com.susanafigueroa.utils.GameInfo
 
 class StartScreen(private val game: GameLibGDX) : Screen {
 
-    // este Stage contiene el viewport por defecto
-    private val stage = Stage(ScreenViewport())
+    // creación de la camara i del viewport
+    private val camera = OrthographicCamera()
+    val viewport = FitViewport(GameInfo.WIDTH.toFloat(), GameInfo.HEIGHT.toFloat(), camera)
+
+    // este Stage contiene el viewport configurado anterior
+    private val stage = Stage(viewport)
     private val font = BitmapFont()
+
+    init {
+        // quiero que el Stage gestione los eventos de entrada
+        Gdx.input.inputProcessor = stage
+    }
 
     override fun show() {
 
         // aumento tamaño de la fuente
-        font.data.setScale(4f)
+        font.data.setScale(2f)
 
         // estilo para la label Welcome
         val labelStyle = Label.LabelStyle()
@@ -58,10 +69,6 @@ class StartScreen(private val game: GameLibGDX) : Screen {
 
         // añado la tabla al Stage
         stage.addActor(table)
-
-        // quiero que el Stage gestione los eventos de entrada
-        Gdx.input.inputProcessor = stage
-
     }
 
     override fun render(delta: Float) {
@@ -74,6 +81,7 @@ class StartScreen(private val game: GameLibGDX) : Screen {
     }
 
     override fun resize(width: Int, height: Int) {
+        stage.viewport.update(width, height, true)
     }
 
     override fun pause() {
