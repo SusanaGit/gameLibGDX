@@ -4,14 +4,19 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.StretchViewport
 import com.susanafigueroa.GameLibGDX
+import com.susanafigueroa.actors.Player
 import com.susanafigueroa.utils.GameInfo
 
 class GameScreen(private val game: GameLibGDX) : Screen {
+
+    private val stage: Stage
 
     private val camera: OrthographicCamera
     private val viewport: StretchViewport
@@ -20,6 +25,8 @@ class GameScreen(private val game: GameLibGDX) : Screen {
     private val tiledMap: TiledMap
     private val mapRenderer: OrthogonalTiledMapRenderer
 
+    private val player: Player
+
     init {
 
         Gdx.app.log("GameScreen", "Estoy en GameScreen")
@@ -27,7 +34,8 @@ class GameScreen(private val game: GameLibGDX) : Screen {
         // creo la cámara
         camera = OrthographicCamera()
 
-        // establece el tamaño de la pantalla y centra la cámara en la ventana gráfica
+        // configuro la cámara en un sistema de coordenadas ortográfico, estandar en juegos 2D
+        // los píxeles de la pantalla corresponden directamente a unidades del mundo del juego
         camera.setToOrtho(false, GameInfo.WIDTH.toFloat(), GameInfo.HEIGHT.toFloat())
 
         // el tamaño que quiero que se muestre
@@ -37,12 +45,20 @@ class GameScreen(private val game: GameLibGDX) : Screen {
             camera
         )
 
+        // creo el stage con el viewport que he creado anteriormente
+        stage = Stage(viewport)
+
         // cargo el mapa
         mapLoader = TmxMapLoader()
         tiledMap = mapLoader.load("map/mapa.tmx")
         Gdx.app.log("GameScreen", "Mapa cargado: $tiledMap")
-        // renderizo (hago que se vea) el mapa en la pantalla
+        // para que se vea el mapa en la pantalla (para renderizarlo) uso OrthogonalTiledMapRenderer
         mapRenderer = OrthogonalTiledMapRenderer(tiledMap)
+
+        // creo el player
+        player = Player()
+        // añado el player al stage
+        stage.addActor(player)
 
     }
 
@@ -55,8 +71,16 @@ class GameScreen(private val game: GameLibGDX) : Screen {
 
         updatePositionCamera(camera, tiledMap)
 
+        // asigna la vista de la cámara al renderizador
         mapRenderer.setView(camera)
         mapRenderer.render()
+
+        // actualiza todos los elementos del stage
+        stage.act()
+
+        // dibuja todos los elementos del stage
+        stage.draw()
+
     }
 
     override fun resize(width: Int, height: Int) {
@@ -72,6 +96,8 @@ class GameScreen(private val game: GameLibGDX) : Screen {
     }
 
     override fun dispose() {
+        mapRenderer.dispose()
+        stage.dispose()
     }
 
     private fun updatePositionCamera(camera: OrthographicCamera, tiledMap: TiledMap) {
@@ -85,9 +111,9 @@ class GameScreen(private val game: GameLibGDX) : Screen {
         Gdx.app.log("cameraWidthPixels", "cameraWidthPixels: ${cameraWidthPixels}")
         Gdx.app.log("cameraHeightPixels", "cameraHeightPixels: ${cameraHeightPixels}")*/
 
-        // defino la posición que quiero que sea el centro de la cámara, en este caso
+        // defino la posición que quiero que sea el centro de la cámara (punto focal), en este caso
         // el centro del mapa
-        camera.position.set(mapWidthPixels/2, mapHeightPixels/2, 0f)
+        //camera.position.set(mapWidthPixels/2, mapHeightPixels/2, 0f)
 
         // cada vez que cambio los parámetros de la camera, tengo que hacer update
         camera.update()
