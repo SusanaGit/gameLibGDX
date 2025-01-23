@@ -19,7 +19,7 @@ class StartScreen(private val game: GameLibGDX) : Screen {
 
     // creación de la camara i del viewport
     private val camera = OrthographicCamera()
-    val viewport = FitViewport(GameInfo.WIDTH.toFloat(), GameInfo.HEIGHT.toFloat(), camera)
+    private val viewport = FitViewport(GameInfo.WIDTH.toFloat(), GameInfo.HEIGHT.toFloat(), camera)
 
     // este Stage contiene el viewport configurado anterior
     private val stage = Stage(viewport)
@@ -63,7 +63,7 @@ class StartScreen(private val game: GameLibGDX) : Screen {
         // ClickListener para el button
         startButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent, x: Float, y: Float) {
-                game.screen = GameScreen()
+                game.screen = GameScreen(game)
             }
         })
 
