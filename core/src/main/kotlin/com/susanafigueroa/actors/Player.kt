@@ -16,22 +16,24 @@ import com.susanafigueroa.utils.GameInfo
 class Player : Actor() {
 
     companion object {
-        const val WIDTH_PLAYER: Float = 80f
-        const val HEIGHT_PLAYER: Float = 80f
-        const val INITIAL_POSITION_X_PLAYER: Float = 80f
-        const val INITIAL_POSITION_Y_PLAYER: Float = 80f
+        const val WIDTH_PLAYER: Float = 40f
+        const val HEIGHT_PLAYER: Float = 40f
+        const val INITIAL_POSITION_X_PLAYER: Float = 100f
+        const val INITIAL_POSITION_Y_PLAYER: Float = 200f
         const val PATH_TEXTURE_PLAYER: String = "player/player.png"
         const val SPEED: Float = 100f
     }
 
     private val texturePlayer: Texture
     private val positionPlayer: Vector2 = Vector2(INITIAL_POSITION_X_PLAYER, INITIAL_POSITION_Y_PLAYER)
-    private val rectanglePlayer: Rectangle
+    val rectanglePlayer: Rectangle
 
     private var playerIsWalking: Boolean
     private lateinit var animationPlayerWalking: Animation<TextureRegion>
 
     private var elapsedTime: Float
+
+    private val previousPosition: Vector2 = Vector2(INITIAL_POSITION_X_PLAYER, INITIAL_POSITION_Y_PLAYER)
 
     init {
 
@@ -58,6 +60,10 @@ class Player : Actor() {
 
     override fun act(delta: Float) {
         super.act(delta)
+
+        // necesito guardar la posición anterior, por si el player se encuentra con un
+        // rectángulo de la capa collision_layer del mapa
+        previousPosition.set(x, y)
 
         playerIsWalking = false
 
@@ -136,6 +142,11 @@ class Player : Actor() {
         // genero la animación -> cada frame durará 0.2 segundos antes de pasar al siguiente frame
         animationPlayerWalking = Animation<TextureRegion>(1f/5f, playerWalkingTextures)
 
+    }
+
+    fun goToPreviousPosition() {
+        setPosition(previousPosition.x, previousPosition.y)
+        rectanglePlayer.setPosition(previousPosition.x, previousPosition.y)
     }
 
 }

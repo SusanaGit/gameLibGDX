@@ -7,10 +7,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.StretchViewport
 import com.susanafigueroa.GameLibGDX
 import com.susanafigueroa.actors.Player
+import com.susanafigueroa.utils.CollisionHandler
 import com.susanafigueroa.utils.GameInfo
 
 class GameScreen(private val game: GameLibGDX) : Screen {
@@ -23,6 +25,9 @@ class GameScreen(private val game: GameLibGDX) : Screen {
     private val mapLoader: TmxMapLoader
     private val tiledMap: TiledMap
     private val mapRenderer: OrthogonalTiledMapRenderer
+
+    private val objectCollisionHandler: CollisionHandler
+    private val collisionRectanglesMap: MutableList<Rectangle>
 
     private val player: Player
 
@@ -54,6 +59,10 @@ class GameScreen(private val game: GameLibGDX) : Screen {
         // para que se vea el mapa en la pantalla (para renderizarlo) uso OrthogonalTiledMapRenderer
         mapRenderer = OrthogonalTiledMapRenderer(tiledMap)
 
+        // meto los rectángulos de colisión de la capa collision_layer en la lista collisionRectanglesMap
+        objectCollisionHandler = CollisionHandler()
+        collisionRectanglesMap = objectCollisionHandler.loadCollisionRectangles(tiledMap, "collision_layer")
+
         // creo el player
         player = Player()
         // añado el player al stage
@@ -73,6 +82,13 @@ class GameScreen(private val game: GameLibGDX) : Screen {
         // asigna la vista de la cámara al renderizador
         mapRenderer.setView(camera)
         mapRenderer.render()
+
+        // verifico colisión entre rectángulo del player y rectángulos de la capa collision_layer del mapa
+        if (objectCollisionHandler.checkCollision(player.rectanglePlayer, collisionRectanglesMap)) {
+            Gdx.app.log("Collision player with collision_layer rectangle", "Collision player with collision_layer rectangle")
+            // si hay colisión con rectángulo de la capa collision_layer, vuelve a la posición anterior
+            player.goToPreviousPosition()
+        }
 
         // actualiza todos los elementos del stage
         stage.act()
@@ -100,11 +116,6 @@ class GameScreen(private val game: GameLibGDX) : Screen {
     }
 
     private fun updatePositionCamera(camera: OrthographicCamera, tiledMap: TiledMap) {
-        val mapWidthPixels = calculateMapWidthInPixels(tiledMap)
-        val mapHeightPixels = calculateMapHeightInPixels(tiledMap)
-        Gdx.app.log("mapWidthPixels", "mapWidthPixels: ${mapWidthPixels}")
-        Gdx.app.log("mapHeightPixels", "mapHeightPixels: ${mapHeightPixels}")
-
         /*val cameraWidthPixels = camera.viewportWidth
         val cameraHeightPixels = camera.viewportHeight
         Gdx.app.log("cameraWidthPixels", "cameraWidthPixels: ${cameraWidthPixels}")
