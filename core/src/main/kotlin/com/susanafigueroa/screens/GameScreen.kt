@@ -116,14 +116,21 @@ class GameScreen(private val game: GameLibGDX) : Screen {
     }
 
     private fun updatePositionCamera(camera: OrthographicCamera, tiledMap: TiledMap) {
-        /*val cameraWidthPixels = camera.viewportWidth
-        val cameraHeightPixels = camera.viewportHeight
-        Gdx.app.log("cameraWidthPixels", "cameraWidthPixels: ${cameraWidthPixels}")
-        Gdx.app.log("cameraHeightPixels", "cameraHeightPixels: ${cameraHeightPixels}")*/
+
+        val mapWithPixels = calculateMapWidthInPixels(tiledMap)
+        val mapHeightPixels = calculateMapHeightInPixels(tiledMap)
+
+        val cameraX: Float = (camera.viewportWidth / 2).coerceAtLeast(
+            (player.x.coerceAtMost(mapWithPixels - camera.viewportWidth / 2))
+        )
+
+        val cameraY: Float = (camera.viewportHeight / 2).coerceAtLeast(
+            (player.y.coerceAtMost(mapHeightPixels - camera.viewportHeight / 2))
+        )
 
         // defino la posición que quiero que sea el centro de la cámara (punto focal), en este caso
-        // el centro del mapa
-        //camera.position.set(mapWidthPixels/2, mapHeightPixels/2, 0f)
+        // donde esté el player
+        camera.position.set(cameraX, cameraY, 0f)
 
         // cada vez que cambio los parámetros de la camera, tengo que hacer update
         camera.update()
